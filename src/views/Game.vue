@@ -1,16 +1,15 @@
 <template>
   <div class="container-fluid" style="height: 100vh;">
-    <h1>this is in the game</h1>
     <div class="container d-flex flex-start overflow-hidden" style="width: 100vw; height: 85vh">
       <div class="w-75 d-flex flex-column justify-content-around text-primary">
         <div>
           <Question :question="question" :no="questionNum"/>
         </div>
-        <h1 style="color: yellow"> <strong>{{ count }}</strong></h1>
-        <Answer/>
+        <Answer v-if="isAnswered" @isAnswer="isAnswer"/>
       </div>
       <div class="w-25 d-flex flex-column align-items-center overflow-auto mt-3" id="sidebar">
-        <Sidebar v-for="index in 5" :key="index" style="width: 90%;"/>
+        <h1 style="color: black; text-shadow: 0 0 5px white"> <strong>{{ count }}</strong></h1>
+        <Sidebar v-for="user in users" :key="user.id" :user="user" style="width: 90%;"/>
       </div>
     </div>
   </div>
@@ -21,6 +20,7 @@ import Sidebar from '../components/Sidebar.vue'
 import Answer from '../components/Answer.vue'
 import Question from '../components/Question.vue'
 import router from '../router'
+import swal from 'sweetalert'
 export default {
   name: 'Game',
   components: {
@@ -30,30 +30,56 @@ export default {
   },
   data () {
     return {
-      count: 3,
-      questionNum: 0
+      count: 60,
+      questionNum: 0,
+      isNextQuestion: false,
+      isAnswered: true
     }
   },
   methods: {
+    async isAnswer (answer) {
+      await this.$store.dispatch('isAnswer', { question: this.question, answer })
+      if (this.$store.state.whoIsRight) {
+        await swal(this.$store.state.whoIsRight + ' is right', {
+          buttons: false,
+          timer: 1000
+        })
+        await this.nextQuestion()
+      } else {
+        await swal('incorrect!!!', {
+          buttons: false,
+          timer: 1000
+        })
+        this.isAnswered = false
+      }
+      await this.$store.dispatch('resetWhoIsRight')
+    },
+    async nextQuestion () {
+      this.isNextQuestion = true
+    },
     async countdown () {
-      if (this.count > 0) {
+      if (this.count > 0 && !this.isNextQuestion) {
         setTimeout(() => {
           this.count -= 1
           this.countdown()
         }, 1000)
       } else {
         if (this.questionNum === this.questionLength - 1) {
+          await this.$store.dispatch('whoIsWinner')
           await router.push({ name: 'reward' })
-          await setTimeout(() => {}, 3000)
-          await this.$store.dispatch('logout')
         }
+        this.isAnswered = true
         this.questionNum += 1
-        this.count = 3
+        this.count = 60
+        this.isNextQuestion = false
         await this.countdown()
       }
     }
   },
   computed: {
+    users () {
+      return this.$store.state.users
+    },
     question () {
       return this.$store.state.questions[this.questionNum]
     },
@@ -61,8 +87,9 @@ export default {
       return this.$store.state.questions.length
     }
   },
-  created () {
-    this.countdown()
+  async created () {
+    await this.$store.dispatch('fetchAll')
+    await this.countdown()
   }
 }
 </script>

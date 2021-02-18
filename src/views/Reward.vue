@@ -1,10 +1,31 @@
 <template>
-  <img src="https://cdn.discordapp.com/attachments/811864005487493141/811921777520803840/7-5d23b88833fbc1cf02a4f948a55e11b0.png" alt="onsu"/>
+  <div class="container">
+    <h1>the winner is {{ winner }} with points: {{ points }}</h1>
+    <button class="btn btn-primary" @click.prevent="logout">Logout</button>
+    <button class="btn btn-primary" @click.prevent="toDashboard">Back to dashboard</button>
+  </div>
 </template>
 
 <script>
+import router from '../router'
 export default {
-  name: 'Reward'
+  name: 'Reward',
+  computed: {
+    winner () {
+      return this.$store.state.whoIsWinner
+    },
+    points () {
+      return this.$store.state.howMuchPoints
+    }
+  },
+  methods: {
+    toDashboard () {
+      router.push({ name: 'lobby' })
+    },
+    logout () {
+      this.$store.dispatch('logout')
+    }
+  }
 }
 </script>
 

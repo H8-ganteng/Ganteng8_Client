@@ -1,8 +1,7 @@
 <template>
-  <form>
+  <form class="d-flex flex-column align-items-center" @submit.prevent="sendAnswer">
     <div class="form-group">
-      <label for="exampleInputEmail1">Email address</label>
-      <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+      <input type="text" v-model="answer" class="form-control" aria-describedby="emailHelp">
     </div>
     <button type="submit" class="btn btn-primary">Submit</button>
   </form>
@@ -10,7 +9,18 @@
 
 <script>
 export default {
-  name: 'Answer'
+  name: 'Answer',
+  data () {
+    return {
+      answer: ''
+    }
+  },
+  methods: {
+    async sendAnswer () {
+      await this.$emit('isAnswer', this.answer)
+      this.answer = ''
+    }
+  }
 }
 </script>
 
