@@ -39,8 +39,9 @@ export default {
   methods: {
     async isAnswer (answer) {
       await this.$store.dispatch('isAnswer', { question: this.question, answer })
-      if (this.$store.state.whoIsRight) {
-        await swal(this.$store.state.whoIsRight + ' is right', {
+
+      if (this.whoIsRight) {
+        await swal(this.whoRight + ' is right', {
           buttons: false,
           timer: 1000
         })
@@ -61,13 +62,11 @@ export default {
       if (this.count > 0 && !this.isNextQuestion) {
         setTimeout(() => {
           this.count -= 1
-          this.$socket.emit('countdown', this.count)
           this.countdown()
         }, 1000)
       } else {
         if (this.questionNum === this.questionLength - 1) {
           await this.$store.dispatch('whoIsWinner')
-          this.$socket.emit('')
           await router.push({ name: 'reward' })
         }
         this.isAnswered = true
@@ -87,6 +86,9 @@ export default {
     },
     questionLength () {
       return this.$store.state.questions.length
+    },
+    whoRight () {
+      return this.$store.state.whoIsRight
     }
   },
   async created () {
