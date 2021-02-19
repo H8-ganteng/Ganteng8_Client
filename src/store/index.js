@@ -34,9 +34,10 @@ export default new Vuex.Store({
       state.users.forEach(user => {
         if (user.username === username) {
           user.points += 10
-          this.$socket.emit('setPoints', user)
+          this._vm.$socket.emit('setPoints', user)
         }
       })
+      // this.$socket.emit('setPoints', state.users)
       state.whoIsRight = username
     },
     SET_WHOISWINNER (state, winner) {
