@@ -1,7 +1,7 @@
 <template>
   <form class="d-flex flex-column align-items-center" @submit.prevent="sendAnswer">
     <div class="form-group">
-      <input type="text" v-model="answer" class="form-control" aria-describedby="emailHelp">
+      <input type="text" v-model="answer" placeholder="type your answer here" class="form-control" aria-describedby="emailHelp">
     </div>
     <button type="submit" class="btn btn-primary">Submit</button>
   </form>

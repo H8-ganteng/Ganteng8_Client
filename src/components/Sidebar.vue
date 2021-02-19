@@ -6,7 +6,7 @@
       </div>
       <div class="w-75 d-flex flex-column align-items-center justify-content-center">
         <h4>{{ user.username }}</h4>
-        <small>score: {{ user.points }} pts</small>
+        <small v-if="$route.name !== 'lobby'">score: {{ user.points }} pts</small>
       </div>
     </div>
   </div>

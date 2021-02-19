@@ -24,6 +24,11 @@ const routes = [
     path: '/reward',
     name: 'reward',
     component: () => import('../views/Reward')
+  },
+  {
+    path: '/room*',
+    name: 'rooms',
+    component: () => import('../views/Room')
   }
 ]
 
