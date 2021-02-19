@@ -101,6 +101,7 @@ export default new Vuex.Store({
           winner = state.users[i + 1]
         }
       }
+      this._vm.$socket.emit('gameFinish')
       commit('SET_HOWMUCHPOINTS', winner.points)
       commit('SET_WHOISWINNER', winner.username)
     },
