@@ -7,8 +7,8 @@
         </div>
         <Answer v-if="isAnswered" @isAnswer="isAnswer"/>
       </div>
+      <h1 style="color: black; text-shadow: 0 0 5px white"> <strong>{{ count }}</strong></h1>
       <div class="w-25 d-flex flex-column align-items-center overflow-auto mt-3" id="sidebar">
-        <h1 style="color: black; text-shadow: 0 0 5px white"> <strong>{{ count }}</strong></h1>
         <Sidebar v-for="user in users" :key="user.id" :user="user" style="width: 90%;"/>
       </div>
     </div>
@@ -30,7 +30,7 @@ export default {
   },
   data () {
     return {
-      count: 60,
+      count: 3,
       questionNum: 0,
       isNextQuestion: false,
       isAnswered: true
@@ -61,16 +61,18 @@ export default {
       if (this.count > 0 && !this.isNextQuestion) {
         setTimeout(() => {
           this.count -= 1
+          this.$socket.emit('countdown', this.count)
           this.countdown()
         }, 1000)
       } else {
         if (this.questionNum === this.questionLength - 1) {
           await this.$store.dispatch('whoIsWinner')
+          this.$socket.emit('')
           await router.push({ name: 'reward' })
         }
         this.isAnswered = true
         this.questionNum += 1
-        this.count = 60
+        this.count = 3
         this.isNextQuestion = false
         await this.countdown()
       }

@@ -14,6 +14,11 @@
 
 <script>
 export default {
+  sockets: {
+    connect () {
+      console.log('connnnectt bray')
+    }
+  },
   name: 'Home',
   data () {
     return {
@@ -22,7 +27,8 @@ export default {
   },
   methods: {
     async isLogin () {
-      await this.$store.dispatch('login', this.username)
+      await this.$socket.emit('login', this.username)
+      // await this.$store.dispatch('login', this.username)
     }
   }
 }

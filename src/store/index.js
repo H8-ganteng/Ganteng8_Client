@@ -13,6 +13,8 @@ export default new Vuex.Store({
     users: [],
     whoIsRight: '',
     whoIsWinner: '',
+    count: 60,
+    isStart: false,
     howMuchPoints: 0,
     rules: [
       'Minimal pemain untuk memulai game adalah 3 orang',
@@ -29,10 +31,10 @@ export default new Vuex.Store({
       state.users = users.data
     },
     SET_WHOISRIGHT (state, username) {
-      console.log(state.users, username)
       state.users.forEach(user => {
         if (user.username === username) {
           user.points += 10
+          this.$socket.emit('setPoints', user)
         }
       })
       state.whoIsRight = username
@@ -42,6 +44,22 @@ export default new Vuex.Store({
     },
     SET_HOWMUCHPOINTS (state, points) {
       state.howMuchPoints = points
+    },
+    ADD_USER (state, user) {
+      state.users.push(user)
+    },
+    SET_COUNT (state, count) {
+      state.count = count
+    },
+    SET_STARTGAME (state) {
+      state.isStart = true
+    },
+    SET_POINTS (state, userFromServer) {
+      state.users.forEach(user => {
+        if (user.username === userFromServer.username) {
+          user.points = userFromServer.points
+        }
+      })
     }
   },
   getters: {
@@ -53,8 +71,30 @@ export default new Vuex.Store({
     }
   },
   actions: {
+    SOCKET_setPoint ({ commit }, user) {
+      commit('SET_POINTS', user)
+    },
+    async SOCKET_countdown ({ commit }, counter) {
+      commit('SET_COUNT', counter)
+    },
+    async SOCKET_addUser ({ commit, dispatch }, data) {
+      if (!data.isGameStart) {
+        console.log(data.isGameStart)
+        commit('ADD_USER', data.user)
+        dispatch('login', data.user.username)
+      } else {
+        console.log('game is start')
+      }
+    },
+    SOCKET_startGameServer ({ commit }) {
+      commit('SET_STARTGAME')
+      router.push('/game')
+    },
+    async SOCKET_setCount ({ commit }) {
+      commit('SET_COUNT', 45)
+    },
     async whoIsWinner ({ state, commit }) {
-      let winner = state.users[0]
+      let winner
       for (let i = 0; i < state.users.length - 1; i++) {
         if (state.users[i].points < state.users[i + 1].points) {
           winner = state.users[i + 1]
@@ -145,11 +185,6 @@ export default new Vuex.Store({
     async login ({ commit, dispatch }, username) {
       if (username) {
         try {
-          await axios({
-            method: 'POST',
-            url: '/createUser',
-            data: { username }
-          })
           localStorage.setItem('username', username)
           await dispatch('fetchUsers')
           await router.push({ path: '/lobby' })

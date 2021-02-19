@@ -12,7 +12,8 @@
             <h4 class="rules" v-for="(rule, index) in rules" :key="index">{{ index + 1 }}. {{ rule }}</h4>
           </div>
         </div>
-        <h1 class="rules"> <strong>{{ count }}</strong></h1>
+<!--        <h1 class="rules"> <strong>{{ counter }}</strong></h1>-->
+        <button class="btn btn-primary" @click="startGame">start</button>
       </div>
     </div>
   </div>
@@ -20,7 +21,7 @@
 
 <script>
 import Sidebar from '../components/Sidebar.vue'
-import router from '../router'
+// import router from '../router'
 export default {
   name: 'Lobby',
   components: {
@@ -28,7 +29,7 @@ export default {
   },
   data () {
     return {
-      count: 45
+      // count: 60
     }
   },
   computed: {
@@ -37,26 +38,39 @@ export default {
     },
     rules () {
       return this.$store.state.rules
+    },
+    counter () {
+      return this.$store.state.count
+    },
+    isGameStart () {
+      return this.$store.state.isStart
     }
   },
   methods: {
-    async countdown () {
-      if (this.count > 0) {
-        await setTimeout(() => {
-          this.count -= 1
-          this.countdown()
-        }, 1000)
-      } else {
-        await this.$store.dispatch('fetchQuestions')
-        await router.push({ name: 'game' })
-      }
+    // async countdown () {
+    //   if (this.count > 0) {
+    //     setTimeout(() => {
+    //       this.count -= 1
+    //       this.$socket.emit('countdown', {
+    //         username: localStorage.username,
+    //         counter: this.count
+    //       })
+    //       this.countdown()
+    //     }, 1000)
+    //   } else {
+    //     await this.$store.dispatch('fetchQuestions')
+    //     await router.push({ name: 'game' })
+    //   }
+    // }
+    startGame () {
+      this.$socket.emit('startGame')
     }
   },
-  async created () {
-    await this.$store.dispatch('fetchUsers')
-    if (this.users.length > 2) {
-      await this.countdown()
-    }
+  created () {
+    this.$store.dispatch('fetchUsers')
+    // if (this.users.length > 2) {
+    //   this.countdown()
+    // }
   }
 }
 </script>
